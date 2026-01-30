@@ -59,15 +59,20 @@ void sort(dataSet *dsptr) {
             int valueToCompare = dsptr->objectValues[j];
             int weightToCompare = dsptr->objectWeights[j];
 
-            float currentValueTocCompare = (float) valueToCompare / (float) weightToCompare;
+            float currentValueToCompare = (float) valueToCompare / (float) weightToCompare;
 
-            if (currentValueTocCompare > currentValue) {
+            if (currentValueToCompare > currentValue) {
+                int tempValue = value;
+                int tempWeight = weight;
+
                 dsptr->objectWeights[j] = weight;
                 dsptr->objectValues[j] = value;
 
-                dsptr->objectValues[i] = valueToCompare;
-                dsptr->objectWeights[i] = weightToCompare;
+                dsptr->objectValues[i] = tempValue;
+                dsptr->objectWeights[i] = tempWeight;
             }
+
+            break;
         }
     }
 }
