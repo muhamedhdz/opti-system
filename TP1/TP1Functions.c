@@ -42,11 +42,33 @@ int KP_greedy(dataSet *dsptr) {
     return rval;
 }
 
-int KP_LP(dataSet *dsptr) {
+#include <stdio.h>
+
+
+int[] KP_LP(dataSet *dsptr) {
     int rval = 0;
 
     sort_by_utility(dsptr);
 
+    float x[dsptr->numberOfObjects];
+    for (int i = 0; i < dsptr->numberOfObjects; i++) {
+        x[i] = 0.0;
+    }
+    int currentCapacity = dsptr->capacity;
+
+    for (int j = 0; j < dsptr->numberOfObjects; j++) {
+        if (currentCapacity == 0) {
+            return x;
+        }
+
+        if (currentCapacity / a[j] < 1.0) {
+            x[j] = currentCapacity / a[j];
+        } else {
+            x[j] = 1.0;
+        }
+        
+        currentCapacity = currentCapacity - x[j] * a[j];
+    }
 
     return rval;
 }
