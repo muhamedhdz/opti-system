@@ -21,4 +21,4 @@ int KP_greedy(dataSet *dsptr);
 
 int KP_LP(dataSet *dsptr);
 
-void sort(dataSet *dsptr);
+void sort_by_utility(dataSet *dsptr);

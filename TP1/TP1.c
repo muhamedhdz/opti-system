@@ -11,7 +11,7 @@ int main(const int argc, char **argv) {
     //File instance name
     //-F option
     char instance_file[1024];
-    snprintf(instance_file, 1024, "%s", "instance2.csv");
+    snprintf(instance_file, 1024, "%s", "instance1.csv");
 
     char c;
     while ((c = getopt(argc, argv, "F:h")) != EOF) {

@@ -24,6 +24,9 @@ int read_TP1_instance(FILE *fin, dataSet *dsptr) {
 
     fprintf(stderr, "\nInstance file read, we have capacity %d and there is %d items of values/weights:\n",
             capacity, numberOfObjects);
+
+    sort_by_utility(dsptr);
+
     for (i = 0; i < numberOfObjects; i++)
         fprintf(stderr, "%d,%d\n", dsptr->objectValues[i], dsptr->objectWeights[i]);
     fprintf(stderr, "\n");
@@ -42,37 +45,44 @@ int KP_greedy(dataSet *dsptr) {
 int KP_LP(dataSet *dsptr) {
     int rval = 0;
 
-    sort(dsptr);
+    sort_by_utility(dsptr);
 
 
     return rval;
 }
 
-void sort(dataSet *dsptr) {
+void sort_by_utility(dataSet *dsptr) {
     for (int i = 0; i < dsptr->numberOfObjects; i++) {
         int value = dsptr->objectValues[i];
         int weight = dsptr->objectWeights[i];
 
-        float currentValue = (float) value / (float) weight;
+        float currentUtility = (float) value / (float) weight;
 
-        for (int j = 0; j < dsptr->numberOfObjects; j++) {
+        int j = i;
+        bool valuesSwitched = false;
+        while (!valuesSwitched && j < dsptr->numberOfObjects) {
             int valueToCompare = dsptr->objectValues[j];
             int weightToCompare = dsptr->objectWeights[j];
 
-            float currentValueToCompare = (float) valueToCompare / (float) weightToCompare;
+            float currentUtilityToCompare = (float) valueToCompare / (float) weightToCompare;
 
-            if (currentValueToCompare > currentValue) {
-                int tempValue = value;
-                int tempWeight = weight;
+            if (currentUtilityToCompare > currentUtility) {
+                int tempValue = valueToCompare;
+                int tempWeight = weightToCompare;
 
-                dsptr->objectWeights[j] = weight;
+                // currentUtilityToCompare
                 dsptr->objectValues[j] = value;
+                dsptr->objectWeights[j] = weight;
 
+                // currentUtility
                 dsptr->objectValues[i] = tempValue;
                 dsptr->objectWeights[i] = tempWeight;
+
+                valuesSwitched = true;
             }
 
-            break;
+            j++;
         }
+
     }
 }
