@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <sys/time.h>
-#include<stdio.h>
+#include <stdio.h>
 
 int read_TP1_instance(FILE *fin, dataSet *dsptr) {
     int rval = 0;
@@ -22,15 +22,11 @@ int read_TP1_instance(FILE *fin, dataSet *dsptr) {
     for (i = 0; i < numberOfObjects; i++)
         rval = fscanf(fin, "%d,%d\n", &(dsptr->objectValues[i]), &(dsptr->objectWeights[i]));
 
-    fprintf(stderr, "\nInstance file read, we have capacity %d and there is %d items of values/weights:\n",
-            capacity, numberOfObjects);
-
-    sort_by_utility(dsptr);
+    fprintf(stderr, "\nInstance file read, we have capacity %d and there is %d items of values/weights:\n", capacity, numberOfObjects);
 
     for (i = 0; i < numberOfObjects; i++)
         fprintf(stderr, "%d,%d\n", dsptr->objectValues[i], dsptr->objectWeights[i]);
     fprintf(stderr, "\n");
-
 
     return rval;
 }
@@ -42,18 +38,15 @@ int KP_greedy(dataSet *dsptr) {
     return rval;
 }
 
-#include <stdio.h>
 
-
-int[] KP_LP(dataSet *dsptr) {
-    int rval = 0;
-
+float* KP_LP(dataSet *dsptr) {
     sort_by_utility(dsptr);
 
-    float x[dsptr->numberOfObjects];
+    float *x = (float*)malloc(sizeof(float) * dsptr->numberOfObjects);    // result tab
     for (int i = 0; i < dsptr->numberOfObjects; i++) {
         x[i] = 0.0;
     }
+
     int currentCapacity = dsptr->capacity;
 
     for (int j = 0; j < dsptr->numberOfObjects; j++) {
@@ -61,16 +54,16 @@ int[] KP_LP(dataSet *dsptr) {
             return x;
         }
 
-        if (currentCapacity / a[j] < 1.0) {
-            x[j] = currentCapacity / a[j];
+        if (currentCapacity / dsptr->objectWeights[j] < 1.0) {
+            x[j] = currentCapacity / dsptr->objectWeights[j];
         } else {
             x[j] = 1.0;
         }
         
-        currentCapacity = currentCapacity - x[j] * a[j];
+        currentCapacity = currentCapacity - x[j] * dsptr->objectWeights[j];
     }
 
-    return rval;
+    return x;
 }
 
 void sort_by_utility(dataSet *dsptr) {

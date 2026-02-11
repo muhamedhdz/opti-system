@@ -9,16 +9,16 @@
 
 
 typedef struct dataSet {
-    int numberOfObjects;
-    int capacity;
-    int *objectValues;
-    int *objectWeights;
+    int numberOfObjects;    //n
+    int capacity;           //b
+    int *objectValues;      //c
+    int *objectWeights;     //a
 } dataSet;
 
 int read_TP1_instance(FILE *fin, dataSet *dsptr);
 
 int KP_greedy(dataSet *dsptr);
 
-int KP_LP(dataSet *dsptr);
+float* KP_LP(dataSet *dsptr);
 
 void sort_by_utility(dataSet *dsptr);

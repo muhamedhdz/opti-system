@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include "TP1Functions.h"
+#include "TP1.h"
 
 
 int main(const int argc, char **argv) {
@@ -37,9 +38,21 @@ int main(const int argc, char **argv) {
     fclose(fin);
 
     //execute your solution methods on the instance you just read
-    KP_greedy(&data);
-    KP_LP(&data);
+    // KP_greedy(&data);
+    // KP_LP(&data);
+
+    test_KP_LP(&data);
 
 
     return 0;
+}
+
+void test_KP_LP(dataSet *dsptr) {
+    float* x = KP_LP(dsptr);
+
+    for (int i = 0; i < dsptr->numberOfObjects; i++)
+        fprintf(stderr, "%f\n", x[i]);
+    fprintf(stderr, "\n");
+
+    free(x);
 }
