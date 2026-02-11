@@ -17,7 +17,7 @@ typedef struct dataSet {
 
 int read_TP1_instance(FILE *fin, dataSet *dsptr);
 
-int KP_greedy(dataSet *dsptr);
+float* KP_greedy(dataSet *dsptr);
 
 float* KP_LP(dataSet *dsptr);
 

@@ -41,13 +41,24 @@ int main(const int argc, char **argv) {
     // KP_greedy(&data);
     // KP_LP(&data);
 
-    test_KP_LP(&data);
-
+    // test_KP_LP(&data);
+    test_KP_greedy(&data);
+    
 
     return 0;
 }
 
 void test_KP_LP(dataSet *dsptr) {
+    float* x = KP_LP(dsptr);
+
+    for (int i = 0; i < dsptr->numberOfObjects; i++)
+        fprintf(stderr, "%f\n", x[i]);
+    fprintf(stderr, "\n");
+
+    free(x);
+}
+
+void test_KP_greedy(dataSet *dsptr) {
     float* x = KP_LP(dsptr);
 
     for (int i = 0; i < dsptr->numberOfObjects; i++)

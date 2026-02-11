@@ -31,11 +31,27 @@ int read_TP1_instance(FILE *fin, dataSet *dsptr) {
     return rval;
 }
 
-int KP_greedy(dataSet *dsptr) {
-    int rval = 0;
+float* KP_greedy(dataSet *dsptr) {
+    sort_by_utility(dsptr);
 
+    float *x = (float*)malloc(sizeof(float) * dsptr->numberOfObjects);    // result tab
+    for (int i = 0; i < dsptr->numberOfObjects; i++) {
+        x[i] = 0.0;
+    }
 
-    return rval;
+    int currentCapacity = dsptr->capacity;
+
+    for (int i = 0; i < dsptr->numberOfObjects; i++) {
+        if (currentCapacity == 0) {
+            return x;
+        }
+
+        if (currentCapacity >= dsptr->objectWeights[i]) {
+            x[i] = 1.0;
+            currentCapacity = currentCapacity - dsptr->objectWeights[i];
+        }
+    }
+    return x;
 }
 
 
