@@ -3,10 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <math.h>
 #include "TP1Functions.h"
 #include "TP1.h"
-
 
 int main(const int argc, char **argv) {
     //File instance name
@@ -41,28 +39,25 @@ int main(const int argc, char **argv) {
     // KP_greedy(&data);
     // KP_LP(&data);
 
-    // test_KP_LP(&data);
-    test_KP_greedy(&data);
-    
+    // testKnapsackLinearRelaxation(&data);
+    testKnapsackGreedy(&data);
 
     return 0;
 }
 
-void test_KP_LP(dataSet *dsptr) {
-    float* x = KP_LP(dsptr);
+void testKnapsackLinearRelaxation(const dataSet *dataset) {
+    float *x = knapsackLinearRelaxation(dataset);
 
-    for (int i = 0; i < dsptr->numberOfObjects; i++)
-        fprintf(stderr, "%f\n", x[i]);
+    for (int i = 0; i < dataset->numberOfObjects; i++) fprintf(stderr, "%f\n", x[i]);
     fprintf(stderr, "\n");
 
     free(x);
 }
 
-void test_KP_greedy(dataSet *dsptr) {
-    float* x = KP_LP(dsptr);
+void testKnapsackGreedy(const dataSet *dataset) {
+    float *x = knapsackGreedy(dataset);
 
-    for (int i = 0; i < dsptr->numberOfObjects; i++)
-        fprintf(stderr, "%f\n", x[i]);
+    for (int i = 0; i < dataset->numberOfObjects; i++) fprintf(stderr, "%f\n", x[i]);
     fprintf(stderr, "\n");
 
     free(x);

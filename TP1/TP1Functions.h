@@ -1,24 +1,19 @@
-#include <stdlib.h>
+#pragma once
 #include <stdio.h>
-#include <string.h>
-#include <strings.h>
-#include <math.h>
-#include <errno.h>
-#include <time.h>
-#include <assert.h>
-
 
 typedef struct dataSet {
-    int numberOfObjects;    //n
-    int capacity;           //b
-    int *objectValues;      //c
-    int *objectWeights;     //a
+    int numberOfObjects;
+    int capacity;
+    int *objectValues;
+    int *objectWeights;
 } dataSet;
 
-int read_TP1_instance(FILE *fin, dataSet *dsptr);
+int read_TP1_instance(FILE *fin, dataSet *dataset);
 
-float* KP_greedy(dataSet *dsptr);
+float *knapsackGreedy(const dataSet *dataset);
 
-float* KP_LP(dataSet *dsptr);
+float *knapsackLinearRelaxation(const dataSet *dataset);
 
-void sort_by_utility(dataSet *dsptr);
+void sort(const dataSet *dataset);
+
+float *initializeProportions(int numberOfObjects);
