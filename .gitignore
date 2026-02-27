@@ -56,3 +56,22 @@ dkms.conf
 
 .idea
 .vscode
+
+# Data files
+*.csv
+*.dat
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+venv/
+.env
+
+# Generated/temp files
+*.tmp
+*.temp
+*.bak

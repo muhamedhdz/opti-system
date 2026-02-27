@@ -1,69 +1,52 @@
-#include <ctype.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
-#include <math.h>
 #include "TP1Functions.h"
-#include "TP1.h"
 
-
-int main(const int argc, char **argv) {
-    //File instance name
-    //-F option
+int main(int argc, char **argv) {
     char instance_file[1024];
-    snprintf(instance_file, 1024, "%s", "instance1.csv");
+    snprintf(instance_file, sizeof(instance_file), "%s", "instance1.csv");
 
-    char c;
-    while ((c = getopt(argc, argv, "F:h")) != EOF) {
-        switch (c) {
+    int opt;
+    while ((opt = getopt(argc, argv, "F:h")) != EOF) {
+        switch (opt) {
             case 'F':
-                snprintf(instance_file, 1024, "%s", optarg);
+                snprintf(instance_file, sizeof(instance_file), "%s", optarg);
                 break;
             case 'h':
-                fprintf(stderr, "Usage: ./TP1 [options]\nOptions:\n\n");
-                fprintf(stderr, "******** INSTANCE DATA ********\n");
-                fprintf(stderr, "\t-F Instance file name to load.......................(default %s).\n", instance_file);
-                break;
+                fprintf(stderr, "Usage: ./TP1 -F <instance.csv>\n");
+                return 0;
             default:
-                exit(0);
+                return 1;
         }
     }
 
-    dataSet data;
+    dataSet data = {0};
 
-    //Open the instance file
     FILE *fin = fopen(instance_file, "r");
-    read_TP1_instance(fin, &data);
+    if (!fin) {
+        perror("fopen");
+        return 1;
+    }
+
+    int rval = read_TP1_instance(fin, &data);
     fclose(fin);
 
-    //execute your solution methods on the instance you just read
-    // KP_greedy(&data);
-    // KP_LP(&data);
+    if (rval != 0) {
+        fprintf(stderr, "Erreur lecture instance (code %d)\n", rval);
+        free(data.objectValues);
+        free(data.objectWeights);
+        return 1;
+    }
 
-    // test_KP_LP(&data);
-    test_KP_greedy(&data);
-    
+    float *xg = KP_greedy(&data);
+    free(xg);
+
+    float *xlp = KP_LP(&data);
+    free(xlp);
+
+    free(data.objectValues);
+    free(data.objectWeights);
 
     return 0;
-}
-
-void test_KP_LP(dataSet *dsptr) {
-    float* x = KP_LP(dsptr);
-
-    for (int i = 0; i < dsptr->numberOfObjects; i++)
-        fprintf(stderr, "%f\n", x[i]);
-    fprintf(stderr, "\n");
-
-    free(x);
-}
-
-void test_KP_greedy(dataSet *dsptr) {
-    float* x = KP_LP(dsptr);
-
-    for (int i = 0; i < dsptr->numberOfObjects; i++)
-        fprintf(stderr, "%f\n", x[i]);
-    fprintf(stderr, "\n");
-
-    free(x);
 }
