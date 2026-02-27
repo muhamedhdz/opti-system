@@ -1,119 +1,103 @@
 #include "TP1Functions.h"
-#include <math.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <sys/time.h>
-#include <stdio.h>
+#include<stdio.h>
 
-int read_TP1_instance(FILE *fin, dataSet *dsptr) {
-    int rval = 0;
+int read_TP1_instance(FILE *fin, dataSet *dataset) {
+    int returnedValue = 0;
 
     int capacity;
     int numberOfObjects;
 
-    rval = fscanf(fin, "%d,%d\n", &numberOfObjects, &capacity);
-    dsptr->capacity = capacity;
-    dsptr->numberOfObjects = numberOfObjects;
-    dsptr->objectValues = (int *) malloc(sizeof(int) * numberOfObjects);
-    dsptr->objectWeights = (int *) malloc(sizeof(int) * numberOfObjects);
+    returnedValue = fscanf(fin, "%d,%d\n", &numberOfObjects, &capacity);
+    dataset->capacity = capacity;
+    dataset->numberOfObjects = numberOfObjects;
+    dataset->objectValues = (int *) malloc(sizeof(int) * numberOfObjects);
+    dataset->objectWeights = (int *) malloc(sizeof(int) * numberOfObjects);
 
+    for (int i = 0; i < numberOfObjects; i++) {
+        returnedValue = fscanf(fin, "%d,%d\n", &dataset->objectValues[i], &dataset->objectWeights[i]);
+    }
 
-    int i;
-    for (i = 0; i < numberOfObjects; i++)
-        rval = fscanf(fin, "%d,%d\n", &(dsptr->objectValues[i]), &(dsptr->objectWeights[i]));
-
-    fprintf(stderr, "\nInstance file read, we have capacity %d and there is %d items of values/weights:\n", capacity, numberOfObjects);
-
-    for (i = 0; i < numberOfObjects; i++)
-        fprintf(stderr, "%d,%d\n", dsptr->objectValues[i], dsptr->objectWeights[i]);
+    fprintf(stderr, "\nInstance file read, we have capacity %d and there is %d items of values/weights:\n",
+            capacity, numberOfObjects);
+    for (int i = 0; i < numberOfObjects; i++) {
+        fprintf(stderr, "%d,%d\n", dataset->objectValues[i], dataset->objectWeights[i]);
+    }
     fprintf(stderr, "\n");
 
-    return rval;
+
+    return returnedValue;
 }
 
-float* KP_greedy(dataSet *dsptr) {
-    sort_by_utility(dsptr);
+float *knapsackGreedy(const dataSet *dataset) {
+    const int numberOfObjects = dataset->numberOfObjects;
 
-    float *x = (float*)malloc(sizeof(float) * dsptr->numberOfObjects);    // result tab
-    for (int i = 0; i < dsptr->numberOfObjects; i++) {
-        x[i] = 0.0;
-    }
+    sort(dataset);
 
-    int currentCapacity = dsptr->capacity;
+    float *proportions = initializeProportions(numberOfObjects);
+    int currentCapacity = dataset->capacity;
 
-    for (int i = 0; i < dsptr->numberOfObjects; i++) {
+    for (int j = 0; j < numberOfObjects; j++) {
         if (currentCapacity == 0) {
-            return x;
+            return proportions;
         }
 
-        if (currentCapacity >= dsptr->objectWeights[i]) {
-            x[i] = 1.0;
-            currentCapacity = currentCapacity - dsptr->objectWeights[i];
+        if (currentCapacity >= dataset->objectWeights[j]) {
+            proportions[j] = 1;
+            currentCapacity -= dataset->objectWeights[j];
         }
     }
-    return x;
+
+    return proportions;
 }
 
+float *knapsackLinearRelaxation(const dataSet *dataset) {
+    const int numberOfObjects = dataset->numberOfObjects;
 
-float* KP_LP(dataSet *dsptr) {
-    sort_by_utility(dsptr);
+    sort(dataset);
 
-    float *x = (float*)malloc(sizeof(float) * dsptr->numberOfObjects);    // result tab
-    for (int i = 0; i < dsptr->numberOfObjects; i++) {
-        x[i] = 0.0;
-    }
+    float *proportions = initializeProportions(numberOfObjects);
+    float currentCapacity = (float) dataset->capacity;
 
-    int currentCapacity = dsptr->capacity;
-
-    for (int j = 0; j < dsptr->numberOfObjects; j++) {
+    for (int j = 0; j < numberOfObjects; j++) {
         if (currentCapacity == 0) {
-            return x;
+            return proportions;
         }
 
-        if (currentCapacity / dsptr->objectWeights[j] < 1.0) {
-            x[j] = currentCapacity / dsptr->objectWeights[j];
-        } else {
-            x[j] = 1.0;
-        }
-        
-        currentCapacity = currentCapacity - x[j] * dsptr->objectWeights[j];
+        const float weight = (float) dataset->objectWeights[j];
+        const float xj = currentCapacity / weight < 1.0f ? currentCapacity / weight : 1.0f;
+
+        proportions[j] = xj;
+        currentCapacity -= xj * weight;
     }
 
-    return x;
+    return proportions;
 }
 
-void sort_by_utility(dataSet *dsptr) {
-    for (int i = 0; i < dsptr->numberOfObjects; i++) {
-        int value = dsptr->objectValues[i];
-        int weight = dsptr->objectWeights[i];
+float *initializeProportions(const int numberOfObjects) {
+    float *proportions = malloc(numberOfObjects * sizeof(float));
+    for (int i = 0; i < numberOfObjects; i++) proportions[i] = 0.0f;
+    return proportions;
+}
 
-        float currentUtility = (float) value / (float) weight;
+void sort(const dataSet *dataset) {
+    const int numberOfObjects = dataset->numberOfObjects;
 
-        int j = i;
-        bool valuesSwitched = false;
-        while (!valuesSwitched && j < dsptr->numberOfObjects) {
-            int valueToCompare = dsptr->objectValues[j];
-            int weightToCompare = dsptr->objectWeights[j];
+    for (int i = 0; i < numberOfObjects - 1; i++) {
+        for (int j = 0; j < numberOfObjects - i - 1; j++) {
+            const float ratio1 = (float) dataset->objectValues[j] / (float) dataset->objectWeights[j];
+            const float ratio2 = (float) dataset->objectValues[j + 1] / (float) dataset->objectWeights[j + 1];
 
-            float currentUtilityToCompare = (float) valueToCompare / (float) weightToCompare;
+            if (ratio1 < ratio2) {
+                const int tempValue = dataset->objectValues[j];
+                dataset->objectValues[j] = dataset->objectValues[j + 1];
+                dataset->objectValues[j + 1] = tempValue;
 
-            if (currentUtilityToCompare > currentUtility) {
-                int tempValue = valueToCompare;
-                int tempWeight = weightToCompare;
-
-                // currentUtilityToCompare
-                dsptr->objectValues[j] = value;
-                dsptr->objectWeights[j] = weight;
-
-                // currentUtility
-                dsptr->objectValues[i] = tempValue;
-                dsptr->objectWeights[i] = tempWeight;
-
-                valuesSwitched = true;
+                const int tempWeight = dataset->objectWeights[j];
+                dataset->objectWeights[j] = dataset->objectWeights[j + 1];
+                dataset->objectWeights[j + 1] = tempWeight;
             }
-
-            j++;
         }
-
     }
 }

@@ -1,5 +1,6 @@
-int main(const int argc, char **argv);
+#pragma once
+int main(int argc, char **argv);
 
-void test_KP_LP(dataSet *dsptr);
+void testKnapsackLinearRelaxation(const dataSet *dataset);
 
-void test_KP_greedy(dataSet *dsptr);
+void testKnapsackGreedy(const dataSet *dataset);
